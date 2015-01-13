@@ -3,6 +3,7 @@ var tileHeight = 84;
 var tileWidth = 101;
 var enemyMinSpeed = 200;
 var enemyMaxSpeed = 300;
+var numberOfEnemies = 6;
 
 // Enemies our player must avoid
 var Enemy = function() {
@@ -11,6 +12,8 @@ var Enemy = function() {
     this.x = 200;
     this.y = Math.floor((Math.random() * 4) + 1) * tileHeight - 30;
     this.speed = Math.random() * (enemyMaxSpeed - enemyMinSpeed) + enemyMinSpeed;
+    this.height = 171;
+    this.width = 101;
 
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
@@ -33,7 +36,7 @@ Enemy.prototype.update = function(dt) {
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+	ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 }
 
 // Now write your own player class
@@ -44,11 +47,20 @@ var Player = function(){
 	this.sprite = 'images/char-boy.png';
 	this.x= 200;
 	this.y= 380;
+	this.height = 171;
+    this.width = 101;
 }
 
 
 Player.prototype.update = function(){
+	this.checkEnemyCollisions();
 
+}
+
+
+Player.prototype.reset = function(){
+	this.x= 200;
+	this.y= 380;
 }
 
 Player.prototype.render = function(){
@@ -62,48 +74,95 @@ Player.prototype.handleInput = function(direction){
 
 	switch(direction){
 		case "left":
-			currentX = this.x - tileWidth;
-			break;
+
+		currentX = this.x - tileWidth;
+		break;
 
 		case "right":
-			currentX = this.x + tileWidth;
-			break;
+		currentX = this.x + tileWidth;
+		break;
 
 		case "up":
-			currentY = this.y - tileHeight;
-			break;
+		currentY = this.y - tileHeight;
+		break;
 
 		case "down":
-			currentY = this.y + tileHeight;
-			break;
+		currentY = this.y + tileHeight;
+		break;
 	}
 
-	this.x = currentX;
-	this.y = currentY;
+	//Avoid character to fall off the canvas horizontally
+	if (currentX < -10 || currentX > 420) {
+		this.x = this.x;
+	} else {
+		this.x = currentX;
+	}
+
+	//Avoid character to fall off the canvas vertically
+	if (currentY < -40 || currentY > 420) {
+		this.y = this.y;
+	} else {
+		this.y = currentY;
+	}
+
+	if (currentY < 0) {
+		this.reset();
+	}
+
+}
+
+// Helper function for collision detection
+Player.prototype.checkEnemyCollisions = function(){
+
+	for(var i = 0; i <= numberOfEnemies-1; i++){
+		if(collisionDetected(this,allEnemies[i])){
+		this.reset();			
+		}
+	}
 
 }
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
-var enemy01 = new Enemy();
-var enemy02 = new Enemy();
-var enemy03 = new Enemy();
 
-var allEnemies = [enemy01, enemy02, enemy03];
+var createEnemies = function(numEnemies) {
+	var enemyArray = [];
+	var enemy;
 
+	for (var i=0; i < numEnemies; i++) {
+		enemy = new Enemy();
+		enemyArray.push(enemy);
+	}
+	return(enemyArray);
+};
+
+var allEnemies = createEnemies(numberOfEnemies);
 var player = new Player();
 
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
 document.addEventListener('keyup', function(e) {
-    var allowedKeys = {
-        37: 'left',
-        38: 'up',
-        39: 'right',
-        40: 'down'
-    };
+	var allowedKeys = {
+		37: 'left',
+		38: 'up',
+		39: 'right',
+		40: 'down'
+	};
 
-    player.handleInput(allowedKeys[e.keyCode]);
+	player.handleInput(allowedKeys[e.keyCode]);
 });
+
+// Additional small helper function to detect collision 
+// between two objects
+var collisionDetected = function(rect1, rect2) {
+	console.log(rect1.y, rect2.x);
+
+	if (rect1.x < rect2.x + rect2.width-20 &&
+		rect1.x + rect1.width-20 > rect2.x &&
+		rect1.y < rect2.y + rect2.height-100 &&
+		rect1.height-100 + rect1.y > rect2.y) {
+		return true;
+}
+};
