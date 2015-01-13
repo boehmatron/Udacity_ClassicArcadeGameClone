@@ -1,6 +1,11 @@
 frontend-nanodegree-arcade-game
 ===============================
 
-Students should use this rubric: https://www.udacity.com/course/viewer#!/c-ud015/l-3072058665/m-3072588797
+FROGGER CLONE
 
-for self-checking their submission.
+The goal of the game is to get the player to the water.
+Pay attention to the bugs that try to prevent you from reaching the water.
+If the player gets caught by the bugs, the player will start again.
+If the player reaches the water, the player Score will increase.
+
+The player can be controlled with the arrow keys.
