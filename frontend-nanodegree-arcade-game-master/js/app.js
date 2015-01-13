@@ -4,6 +4,7 @@ var tileWidth = 101;
 var enemyMinSpeed = 200;
 var enemyMaxSpeed = 300;
 var numberOfEnemies = 6;
+var playerScore = 0;
 
 // Enemies our player must avoid
 var Enemy = function() {
@@ -66,6 +67,9 @@ Player.prototype.reset = function(){
 Player.prototype.render = function(){
 	ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 
+	ctx.font = "20pt Arial";
+    ctx.fillText(playerScore, 20, 80);
+
 }
 
 Player.prototype.handleInput = function(direction){
@@ -106,6 +110,7 @@ Player.prototype.handleInput = function(direction){
 	}
 
 	if (currentY < 0) {
+		playerScore++;
 		this.reset();
 	}
 
@@ -115,7 +120,7 @@ Player.prototype.handleInput = function(direction){
 Player.prototype.checkEnemyCollisions = function(){
 
 	for(var i = 0; i <= numberOfEnemies-1; i++){
-		if(collisionDetected(this,allEnemies[i])){
+		if(detectCollision(this,allEnemies[i])){
 		this.reset();			
 		}
 	}
@@ -156,7 +161,7 @@ document.addEventListener('keyup', function(e) {
 
 // Additional small helper function to detect collision 
 // between two objects
-var collisionDetected = function(rect1, rect2) {
+var detectCollision = function(rect1, rect2) {
 	console.log(rect1.y, rect2.x);
 
 	if (rect1.x < rect2.x + rect2.width-20 &&
